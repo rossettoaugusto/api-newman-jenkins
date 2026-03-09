@@ -41,14 +41,3 @@ pipeline {
         }
     }
 }
-```
-
----
-
-Depois do próximo build vai aparecer **"Newman Report"** no menu lateral do job assim:
-```
-api-tests/
-├── Construir agora
-├── Configurar
-├── Newman Report       ← novo botão aqui
-└── Histórico de builds
