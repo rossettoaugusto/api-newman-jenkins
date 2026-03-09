@@ -1,0 +1,333 @@
+{
+  "info": {
+    "_postman_id": "bc7bd1b6-1346-4621-ab3a-2ca803286507",
+    "name": "FakeStore API — Desafio QA Augusto Rossetto",
+    "description": "Coleção de testes de API para o desafio técnico CERTI. Cobre casos básicos, intermediários e avançados da FakeStore API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "7626855"
+  },
+  "item": [
+    {
+      "name": "Básicos",
+      "item": [
+        {
+          "name": "API-001 — Listar todos os produtos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const totalProdutos = json.length;",
+                  "",
+                  "pm.test(\"Requisição retornou status code 200\", function() { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test(\"Listagem retornou \" + totalProdutos + \" produtos\", function() { pm.expect(json).to.be.an('array'); pm.expect(totalProdutos).to.be.greaterThan(0); });",
+                  "",
+                  "pm.test(\"Tempo de resposta < 2000ms\", function() { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "Verifica se a listagem de produtos retorna array com todos os itens e campos obrigatórios."
+          },
+          "response": []
+        },
+        {
+          "name": "API-002 — Buscar produto por ID válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const produtoId = json.id;",
+                  "const produtoTitulo = json.title;",
+                  "",
+                  "pm.test(\"Requisição retornou status code 200\", function() { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test(\"Produto encontrado com o ID \" + produtoId + \" - \" + produtoTitulo, function() { pm.expect(produtoId).to.eql(1); pm.expect(produtoTitulo).to.not.be.null; });",
+                  "",
+                  "pm.test(\"Categoria não está vazia\", function() { pm.expect(json.category).to.not.be.empty; });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            },
+            "description": "Verifica se a busca por ID válido retorna o produto correto com todos os campos."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Intermediários",
+      "item": [
+        {
+          "name": "API-003 — Criar novo produto (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const produtoId = json.id;",
+                  "pm.collectionVariables.set(\"produto_id\", produtoId);",
+                  "",
+                  "pm.test(\"Requisição retornou status code 201\", function() { pm.response.to.have.status(201); });",
+                  "",
+                  "pm.test(\"Produto cadastrado com o ID \" + produtoId, function() { pm.expect(json.id).to.exist; pm.expect(json.title).to.eql(\"Produto Teste Augusto\"); });",
+                  "",
+                  "pm.test(\"Preço correto na resposta\", function() { pm.expect(json.price).to.eql(0.99); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Produto Teste Augusto\",\n    \"price\": 0.99,\n    \"description\": \"Produto criado durante testes de API\",\n    \"image\": \"https://i.pravatar.cc/150\",\n    \"category\": \"electronics\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "Verifica se a criação de produto via POST retorna o objeto com ID gerado."
+          },
+          "response": []
+        },
+        {
+          "name": "API-004 — Atualizar produto existente (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Título atualizado na resposta\", () => {",
+                  "    pm.expect(pm.response.json().title).to.eql(\"Produto Atualizado\");",
+                  "});",
+                  "pm.test(\"Preço atualizado na resposta\", () => {",
+                  "    pm.expect(pm.response.json().price).to.eql(150.00);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Produto Atualizado\",\n    \"price\": 150.00,\n    \"description\": \"Descrição atualizada via PUT\",\n    \"image\": \"https://i.pravatar.cc/150\",\n    \"category\": \"electronics\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/7",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "7"
+              ]
+            },
+            "description": "Verifica se a atualização completa via PUT reflete os novos dados na resposta."
+          },
+          "response": []
+        },
+        {
+          "name": "API-005 — Deletar produto (DELETE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Produto deletado retornado na resposta\", () => {",
+                  "    pm.expect(pm.response.json().id).to.eql(6);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/6",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "6"
+              ]
+            },
+            "description": "Verifica se o DELETE retorna o objeto do produto deletado. Nota: nada é realmente removido do banco."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Avançados",
+      "item": [
+        {
+          "name": "API-007 — Login com credenciais válidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Token JWT retornado\", () => {",
+                  "    const token = pm.response.json().token;",
+                  "    pm.expect(token).to.exist;",
+                  "    pm.expect(token).to.be.a('string').and.to.have.lengthOf.above(10);",
+                  "    pm.collectionVariables.set(\"token\", token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"mor_2314\",\n    \"password\": \"83r5^_\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Verifica se o login com credenciais válidas retorna um token JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "API-008 — Filtrar produtos por categoria electronics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const totalProdutos = json.length;",
+                  "",
+                  "pm.test(\"Requisição retornou status code 200\", function() { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test(\"Filtro retornou \" + totalProdutos + \" produtos da categoria electronics\", function() { pm.expect(json).to.be.an('array').and.to.have.lengthOf.above(0); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/category/electronics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "category",
+                "electronics"
+              ]
+            },
+            "description": "Verifica se todos os produtos retornados pertencem à categoria electronics, garantindo consistência da filtragem."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://fakestoreapi.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "produto_id",
+      "value": ""
+    }
+  ]
+}
